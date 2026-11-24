@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Sabor Cruceño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Mulish:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Idea de layout: selva de arriba hacia abajo. Portada con luz y hojas que caen, franja de ingredientes,
+   historia, carta con barra de categorías pegajosa y pedido por WhatsApp, reservas. Una sola paleta oscura. */
+:root{
+  --selva-950:#08190d;
+  --selva-900:#0c2a14;
+  --selva-700:#1d5129;
+  --hoja:#62b13f;
+  --lima:#bde56f;
+  --brasa:#f4a03a;
+  --crema:#f6f0e1;
+  --crema-suave:rgba(246,240,225,.76);
+  --linea:rgba(246,240,225,.18);
+  --display:'Alfa Slab One', Georgia, 'Times New Roman', serif;
+  --body:'Mulish', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --gutter:clamp(18px,5vw,48px);
+  --leaf:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M8 40c9-18 25-20 34-15-5 16-18 25-34 15z' fill='%23ffffff' fill-opacity='.07'/%3E%3Cpath d='M44 68c7-13 16-16 23-13-4 12-13 18-23 13z' fill='%23ffffff' fill-opacity='.05'/%3E%3C/svg%3E");
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+html.lock{overflow:hidden}
+body{margin:0;background:var(--selva-950);color:var(--crema);font-family:var(--body);font-size:1rem;line-height:1.55}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:400;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brasa);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--gutter)}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:999px;border:2px solid var(--crema);background:transparent;color:var(--crema);font-weight:800;letter-spacing:.02em;text-decoration:none;cursor:pointer;transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s,color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn--brasa{background:var(--brasa);border-color:var(--brasa);color:#1a1205}
+.btn--brasa:hover{background:#ffb455}
+
+/* Barra superior */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;height:56px;display:flex;align-items:center;transition:background .3s,box-shadow .3s}
+.top.solid{background:rgba(8,25,13,.92);backdrop-filter:blur(8px);box-shadow:0 1px 0 var(--linea)}
+.top .wrap{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-size:1rem;text-decoration:none;white-space:nowrap}
+.nav{display:flex;align-items:center;gap:6px}
+.nav a,.nav button{min-height:44px;display:inline-flex;align-items:center;padding:0 10px;text-decoration:none;font-weight:800;font-size:.9rem;background:none;border:0;cursor:pointer}
+.nav .pill{border:2px solid var(--brasa);border-radius:999px;color:var(--brasa);padding:0 14px}
+.nav .pill[hidden]{display:none}
+.nav .pill span{margin-left:6px;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.nav.has-order a{display:none}}
+.lead{text-shadow:0 2px 10px rgba(8,25,13,.8)}
+
+/* Portada */
+.hero{position:relative;overflow:hidden;isolation:isolate;padding:112px 0 96px;background:
+  radial-gradient(ellipse 80% 55% at 50% 0%,#2f7d3f 0%,rgba(47,125,63,0) 70%),
+  radial-gradient(ellipse 60% 40% at 50% 112%,rgba(244,160,58,.32) 0%,rgba(244,160,58,0) 70%),
+  linear-gradient(rgba(8,25,13,.50),rgba(8,25,13,.86)),
+  url(portada.jpg) center/cover no-repeat,#08190d}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.rays{position:absolute;inset:-30% -20% 0 -20%;z-index:0;pointer-events:none;transform-origin:50% 0;
+  background:repeating-conic-gradient(from 168deg at 50% 0%,rgba(205,255,150,0) 0 5deg,rgba(205,255,150,.13) 5deg 8deg,rgba(205,255,150,0) 8deg 14deg);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 72%);mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 72%);
+  animation:sway 14s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.hero__inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:22px;will-change:transform}
+.eyebrow{font-weight:800;letter-spacing:.22em;text-transform:uppercase;font-size:.78rem;color:var(--lima)}
+.title{font-size:clamp(2.9rem,14.5vw,7.4rem);line-height:.98;text-shadow:0 4px 0 rgba(8,25,13,.55)}
+.title .w{display:block;white-space:nowrap}
+.title .ch{display:inline-block;animation:letra .7s cubic-bezier(.16,1,.3,1) backwards;animation-delay:calc(var(--i) * 45ms)}
+.title .w:last-child .ch{color:var(--brasa)}
+@keyframes letra{from{opacity:0;transform:translateY(.45em) rotate(-6deg)}}
+.lead{max-width:34ch;font-size:1.12rem;color:var(--crema-suave)}
+.hero__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+
+/* Franja de ingredientes */
+.marquee{overflow:hidden;background:var(--brasa);color:#1a1205;border-block:2px solid #1a1205;transform:rotate(-1.2deg);margin:-26px -6px 0;position:relative;z-index:2}
+.marquee__track{display:flex;width:max-content;animation:mq 34s linear infinite}
+.marquee span{display:inline-flex;align-items:center;gap:22px;padding:13px 0 13px 22px;font-family:var(--display);font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.marquee span::after{content:"";width:9px;height:9px;background:#1a1205;transform:rotate(45deg)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* Secciones */
+section{position:relative}
+.sec{padding:84px 0 28px}
+.sec h2{font-size:clamp(1.9rem,7.4vw,3.2rem);line-height:1.05}
+.kicker{display:block;margin-bottom:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-size:.76rem;color:var(--lima)}
+
+/* Historia */
+.story{display:grid;gap:28px}
+.story__txt{display:grid;gap:16px;color:var(--crema-suave);font-size:1.06rem;max-width:62ch}
+.explorer{margin-top:10px;display:grid;gap:12px}
+.explorer h3{font-size:1.1rem}
+.chips-ing{display:flex;flex-wrap:wrap;gap:10px}
+.ing{min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;border:2px solid var(--linea);background:rgba(246,240,225,.04);cursor:pointer;font-weight:800;transition:border-color .2s,background .2s,transform .2s cubic-bezier(.16,1,.3,1)}
+.ing b{color:var(--brasa);font-variant-numeric:tabular-nums}
+.ing:hover{border-color:var(--brasa);transform:translateY(-2px)}
+
+/* Carta */
+.menu-head{display:grid;gap:18px;padding-bottom:18px}
+.search{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.search input{flex:1 1 220px;min-height:48px;padding:0 18px;border-radius:999px;border:2px solid var(--linea);background:rgba(246,240,225,.06)}
+.search input::placeholder{color:rgba(246,240,225,.55)}
+.search button{min-height:48px;padding:0 18px;border-radius:999px;border:2px solid var(--linea);background:none;cursor:pointer;font-weight:800}
+#count{min-height:1.5em;color:var(--lima);font-weight:600}
+.catbar{position:sticky;top:56px;z-index:30;background:rgba(8,25,13,.94);backdrop-filter:blur(8px);border-block:1px solid var(--linea)}
+.catbar__scroll{display:flex;gap:8px;overflow-x:auto;padding:10px var(--gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.catbar__scroll::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-height:44px;padding:0 16px;border-radius:999px;border:2px solid transparent;background:rgba(246,240,225,.07);cursor:pointer;font-weight:800;font-size:.92rem;white-space:nowrap;transition:background .2s,color .2s}
+.chip.on{background:var(--brasa);color:#1a1205}
+.chip.dim{opacity:.38}
+.cat{scroll-margin-top:122px;padding-top:34px}
+.cat__head{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;min-height:168px;padding:18px 20px;border-radius:18px;background:var(--leaf),linear-gradient(125deg,var(--selva-700),var(--selva-900));background-size:72px 72px,cover;background-position:center}
+.cat:nth-child(even) .cat__head{background:var(--leaf),linear-gradient(125deg,#2a5f2a,#0d2b15 70%,#3a2a0e)}
+.cat__head h2{position:relative;text-shadow:0 2px 12px rgba(8,25,13,.9);font-size:clamp(1.6rem,6.4vw,2.4rem)}
+.cat__head p{position:relative;color:var(--crema-suave);font-weight:600;font-size:.9rem}
+.cat__num{position:absolute;right:14px;top:-6px;font-family:var(--display);font-size:5.6rem;line-height:1;color:transparent;-webkit-text-stroke:2px rgba(246,240,225,.22)}
+.cat__list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));column-gap:44px;margin-top:6px}
+.dish{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:start;padding:18px 0;border-bottom:1px dashed var(--linea)}
+.dish h3{font-size:1.06rem;line-height:1.2;margin-bottom:6px}
+.dish p{color:var(--crema-suave);font-size:.94rem;line-height:1.5}
+.dish__buy{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.buy{position:relative;min-height:44px;min-width:92px;padding:0 14px;border-radius:999px;border:2px solid var(--brasa);background:transparent;color:var(--brasa);font-weight:800;cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums;transition:background .2s,color .2s,transform .2s cubic-bezier(.16,1,.3,1)}
+.buy:hover{background:rgba(244,160,58,.14)}
+.buy:active{transform:scale(.95)}
+.buy.on{background:var(--brasa);color:#1a1205}
+.buy__qty{margin-left:8px;font-weight:800}
+.buy.pop{animation:pop .35s cubic-bezier(.16,1,.3,1)}
+@keyframes pop{40%{transform:scale(1.12)}}
+
+/* Reservas */
+.resa{display:grid;gap:26px}
+.info{display:grid;gap:12px}
+.info div{padding:16px 18px;border:1px solid var(--linea);border-radius:14px;background:rgba(246,240,225,.04)}
+.info dt{font-weight:800;color:var(--lima);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase}
+.info dd{margin:4px 0 0}
+.info dd.muted{color:rgba(246,240,225,.6)}
+form.f{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:22px;border-radius:18px;background:linear-gradient(160deg,var(--selva-700),var(--selva-900));border:1px solid var(--linea)}
+.field{display:grid;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-weight:800;font-size:.86rem}
+.field input,.field textarea{min-height:48px;padding:10px 14px;border-radius:12px;border:2px solid var(--linea);background:rgba(8,25,13,.55);width:100%}
+.field textarea{min-height:84px;resize:vertical}
+#resaErr{grid-column:1/-1;color:#ffd08a;min-height:1.4em;font-weight:600}
+#resaOut{grid-column:1/-1;display:grid;gap:12px;padding:16px;border-radius:14px;background:rgba(8,25,13,.6)}
+#resaOut p{color:var(--crema-suave)}
+
+footer{margin-top:84px;padding:34px 0 120px;border-top:1px solid var(--linea);color:rgba(246,240,225,.7);font-size:.92rem}
+footer .wrap{display:grid;gap:6px}
+footer strong{font-family:var(--display);font-weight:400;color:var(--crema);font-size:1.1rem}
+
+/* Barra de pedido y hoja */
+.orderbar{position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;justify-content:center;padding:12px var(--gutter) calc(12px + env(safe-area-inset-bottom));transform:translateY(120%);transition:transform .35s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.orderbar.show{transform:none}
+.orderbar button{pointer-events:auto;width:min(520px,100%);min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 22px;border-radius:999px;border:0;background:var(--brasa);color:#1a1205;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.orderbar b{font-variant-numeric:tabular-nums}
+.sheet{position:fixed;inset:0;z-index:60;display:none}
+.sheet.open{display:block}
+.sheet__bg{position:absolute;inset:0;background:rgba(3,10,5,.7)}
+.sheet__panel{position:absolute;left:0;right:0;bottom:0;max-height:90%;overflow:auto;margin:0 auto;max-width:640px;padding:22px var(--gutter) calc(26px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;background:var(--selva-900);border:1px solid var(--linea);border-bottom:0;animation:sube .35s cubic-bezier(.16,1,.3,1)}
+@keyframes sube{from{transform:translateY(40px);opacity:.4}}
+.sheet__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.sheet__top h2{font-size:1.5rem}
+.x{min-width:44px;min-height:44px;border-radius:50%;border:2px solid var(--linea);background:none;cursor:pointer;font-size:1.3rem;line-height:1}
+.lines{list-style:none;margin:0;padding:0}
+.line{display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--linea)}
+.line__t{display:grid}
+.line__t span{color:var(--crema-suave);font-size:.86rem}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:40px;height:40px;border-radius:50%;border:2px solid var(--linea);background:none;cursor:pointer;font-size:1.2rem;line-height:1}
+.step span{min-width:1.6em;text-align:center;font-weight:800}
+.line__p{font-weight:800;font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right}
+.empty{padding:18px 0;color:var(--crema-suave)}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 12px;font-family:var(--display);font-size:1.4rem}
+.sheet .field{margin-top:10px}
+.sheet textarea.prev{min-height:120px;font-size:.88rem;color:var(--crema-suave)}
+.actions{display:grid;gap:10px;margin-top:16px}
+#copyMsg{min-height:1.4em;color:var(--lima);font-weight:600}
+
+@media (min-width:820px){
+  .story{grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+  .resa{grid-template-columns:1fr 1.2fr;align-items:start;gap:40px}
+  .hero{padding:150px 0 130px}
+}
+@media (max-width:420px){
+  .nav a.hide-s{display:none}
+  form.f{grid-template-columns:1fr}
+}
+
+/* Entrada al hacer scroll: solo para lo que está fuera de pantalla al cargar */
+.pre{opacity:0;transform:translateY(20px)}
+.pre.in{opacity:1;transform:none;transition:opacity .6s ease-out,transform .6s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0ms)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .pre{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="topbar">
+  <div class="wrap">
+    <a class="brand" href="#inicio">Sabor Cruceño</a>
+    <nav class="nav" aria-label="Principal">
+      <a class="hide-s" href="#historia">Historia</a>
+      <a href="#carta">Carta</a>
+      <a href="#reservas">Reservas</a>
+      <button type="button" class="pill" id="navOrder" hidden>Pedido <span id="navCount">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="inicio">
+    <canvas id="vines" aria-hidden="true"></canvas>
+    <div class="rays" aria-hidden="true"></div>
+    <canvas id="fx" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero__inner" id="heroInner">
+        <p class="eyebrow">Cocina del oriente boliviano</p>
+        <h1 class="title" id="title"><span class="w">El Sabor</span><span class="w">Cruceño</span></h1>
+        <p class="lead">Yuca, plátano, maíz y charque, en recetas caseras que pasan de generación en generación.</p>
+        <div class="hero__cta">
+          <a class="btn btn--brasa" href="#carta">Ver la carta</a>
+          <a class="btn" href="#reservas">Reservar mesa</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="mq"></div>
+  </div>
+
+  <section class="sec" id="historia">
+    <div class="wrap story">
+      <div class="reveal">
+        <span class="kicker">Nuestra historia</span>
+        <h2>Sabor, cultura y tradición</h2>
+      </div>
+      <div class="story__txt reveal">
+        <p>El Sabor Cruceño nació con la idea de compartir los auténticos sabores del oriente boliviano. Inspirado en las tradiciones de Santa Cruz, combina ingredientes típicos como la yuca, el plátano, el maíz y el charque, rescatando recetas caseras que pasan de generación en generación.</p>
+        <p>Aquí, cada plato refleja el calor humano, la alegría y la identidad camba, ofreciendo una experiencia que une sabor, cultura y tradición.</p>
+        <div class="explorer">
+          <h3>Busca en la carta por ingrediente</h3>
+          <div class="chips-ing" id="ings"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="carta">
+    <div class="wrap">
+      <div class="menu-head sec" style="padding-bottom:18px">
+        <div class="reveal">
+          <span class="kicker">La carta</span>
+          <h2>Elige, suma y pide</h2>
+        </div>
+        <div class="search reveal">
+          <label for="q">Buscar un plato o ingrediente</label>
+          <input id="q" type="search" placeholder="Busca: yuca, singani, postre…" autocomplete="off">
+          <button type="button" id="clear" hidden>Ver todo</button>
+        </div>
+        <p id="count" aria-live="polite"></p>
+      </div>
+    </div>
+    <nav class="catbar" aria-label="Categorías de la carta">
+      <div class="catbar__scroll" id="chips"></div>
+    </nav>
+    <div class="wrap" id="menu"></div>
+  </section>
+
+  <section class="sec" id="reservas">
+    <div class="wrap resa">
+      <div class="reveal">
+        <span class="kicker">Visítanos</span>
+        <h2>Reserva tu mesa</h2>
+        <dl class="info" id="info" style="margin:22px 0 0"></dl>
+      </div>
+      <form class="f reveal" id="resa" novalidate>
+        <div class="field"><label for="rname">Nombre</label><input id="rname" autocomplete="name" required></div>
+        <div class="field"><label for="rppl">Personas</label><input id="rppl" type="number" inputmode="numeric" min="1" max="30" value="2"></div>
+        <div class="field"><label for="rdate">Fecha</label><input id="rdate" type="date" required></div>
+        <div class="field"><label for="rtime">Hora</label><input id="rtime" type="time" required></div>
+        <div class="field full"><label for="rnote">Algo que debamos saber (opcional)</label><textarea id="rnote"></textarea></div>
+        <p id="resaErr" role="alert"></p>
+        <button class="btn btn--brasa full" style="grid-column:1/-1" type="submit">Preparar reserva</button>
+        <div id="resaOut" hidden>
+          <p>Tu reserva está lista. Envíala por WhatsApp para que el local la confirme.</p>
+          <a class="btn btn--brasa" id="resaLink" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <strong>El Sabor Cruceño</strong>
+    <p>Sitio de demostración. Los platos, precios y datos de contacto se editan en un solo lugar.</p>
+  </div>
+</footer>
+
+<div class="orderbar" id="orderbar">
+  <button type="button" id="orderOpen" aria-label="Ver mi pedido">
+    <span id="obText">Ver pedido</span><b id="obTotal">$0</b>
+  </button>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet__bg" id="sheetBg"></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet__top">
+      <h2 id="sheetTitle">Tu pedido</h2>
+      <button type="button" class="x" id="sheetClose" aria-label="Cerrar pedido">×</button>
+    </div>
+    <ul class="lines" id="lines"></ul>
+    <div class="total"><span>Total</span><span id="total">$0</span></div>
+    <div class="field"><label for="cname">Tu nombre</label><input id="cname" autocomplete="name"></div>
+    <div class="field"><label for="cnote">Nota para el local (opcional)</label><input id="cnote"></div>
+    <div class="field"><label for="prev">Mensaje que se enviará</label><textarea id="prev" class="prev" readonly></textarea></div>
+    <div class="actions">
+      <a class="btn btn--brasa" id="wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+      <button type="button" class="btn" id="copy">Copiar pedido</button>
+      <p id="copyMsg" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ====== Datos que el local puede cambiar ====== */
+var CONFIG = {
+  nombre: 'El Sabor Cruceño',
+  whatsapp: '',      /* número con código de país, sin + ni espacios. Ejemplo: 56912345678 */
+  direccion: '',
+  horario: ''
+};
+
+/* Cada plato: [nombre, descripción, precio] o [nombre, descripción, [[etiqueta, precio], ...]] */
+var CATS = [
+  {id:'aperitivos', name:'Aperitivos', items:[
+    ['Chuflay Tradicional','Cóctel clásico boliviano con singani, ginger ale y rodaja de limón. Refrescante para comenzar.',4900],
+    ['Singani Sour Camba','Versión oriental del clásico sour: singani, jugo de limón, clara de huevo y azúcar. La opción más tradicional y cremosa.',5200],
+    ['Poncho Negro','Clásica versión camba del cuba libre con singani, cítricos y el toque especial del refresco de cola.',4800],
+    ['Camba Punch','Exclusiva mezcla de singani, chivé de yuca tostada y el toque dulce del mocochinchi. Un aperitivo que rescata los sabores auténticos del oriente boliviano.',5200]
+  ]},
+  {id:'entradas-frias', name:'Entradas frías', items:[
+    ['Fiambre Cruceño','Una auténtica tabla fría que evoca las tardes cruceñas. Presenta una cuidada selección de queso menonita artesanal y embutidos locales, acompañada de yuca cocida que aporta una textura suave. El toque de intensidad lo pone la tradicional salsa llajwa, preparada en casa.',8900],
+    ['Ensalada de Yuca con Charque','Un clásico refrescante del oriente boliviano. Nuestra ensalada lleva yuca cocida y fría, servida con charque desmenuzado, sazonado con un sofrito de tomate y cebolla para un sabor profundo y nostálgico.',8500],
+    ['Ensalada Cruceña de Arroz','Una fresca y cremosa ensalada de arroz, perfecta para cualquier ocasión. Combina arroz frío con choclo fresco, huevo duro, arvejas y zanahoria, todo unido por una mayonesa casera que le da un sabor inigualable.',7900],
+    ['Ensalada de Palmito Camba','Luminosa y vibrante ensalada que resalta el sabor tierno del palmito fresco, armonizado con tomate, cebolla morada y huevo duro. Un sencillo pero potente aliño de aceite de oliva y limón despierta todos los sabores.',8200]
+  ]},
+  {id:'entradas-calientes', name:'Entradas calientes', items:[
+    ['Sonso de Yuca con Queso','Crujiente por fuera y suave por dentro, esta irresistible masa de yuca es mezclada con cremoso queso menonita y horneada a la perfección.',9900],
+    ['Masaco de Plátano con Charque','Una verdadera delicia cruceña, con plátano verde molido y mezclado con sabroso charque desmenuzado, servido caliente para resaltar su textura suave y reconfortante.',9500],
+    ['Empanadas de Arroz con Queso','Pequeñas joyas de la gastronomía cruceña. Nuestras empanadas fritas de masa de arroz, increíblemente crujientes, esconden un delicioso y derretido corazón de queso.',8500],
+    ['Tamal de Maíz con Queso','Un clásico de la región, hecho con masa de maíz tierno y envuelto en la hoja del propio choclo, con un cremoso y delicioso corazón de queso derretido.',9800]
+  ]},
+  {id:'platos-principales', name:'Platos principales', items:[
+    ['Majadito Batido de Charque','Un plato tradicional del oriente boliviano que consiste en arroz sazonado con urucú (o achiote), mezclado con charque (carne de res seca y desmenuzada). Se sirve acompañado de un huevo frito y plátano frito. La textura “batida” lo diferencia de la versión “tostada”.',13900],
+    ['Patasca Camba','Un guiso sustancioso, típico del oriente boliviano. Se prepara con maíz pelado (mote), carne de res y cerdo, cocido lentamente hasta que la carne esté muy tierna y el caldo espese. Se aromatiza con hierbas y especias de la región.',14200],
+    ['Locro de Gallina Criolla','Una sopa cremosa y contundente, popular en la región oriental de Bolivia. Se elabora con gallina criolla, arroz, yuca y choclo (maíz tierno), cocinada con especias locales para obtener un sabor profundo y hogareño.',13500],
+    ['Keperí al Horno con Arroz con Queso','Un plato representativo de la cocina boliviana oriental. Consiste en tiras de carne de res marinada y cocinada lentamente al horno. Se sirve con arroz cremoso mezclado con queso menonita, y se acompaña con plátano frito.',14500]
+  ]},
+  {id:'dietas', name:'Dietas', items:[
+    ['Pira Caldo','Auténtico caldo claro de pescado con yuca, plátano verde y hierbas aromáticas del oriente.',8500],
+    ['Ensalada Camba con Pollo a la Plancha','Ensalada fresca con tomate, cebolla, palmito y pechuga de pollo grillada. Una opción ligera y sabrosa.',8000],
+    ['Tapioca con Leche y Frutas','Postre ligero de tapioca cocida con leche y frutas tropicales frescas.',7500],
+    ['Masaco de Plátano Horneado','Versión saludable del masaco tradicional, horneada en lugar de frita, sin grasas añadidas.',8200]
+  ]},
+  {id:'acompanamientos', name:'Acompañamientos', items:[
+    ['Arroz con Queso Menonita','Arroz cremoso cocido a la perfección con nuestro auténtico queso menonita, un acompañamiento rico y reconfortante.',3500],
+    ['Plátano Frito en Tajadas','Crujientes tajadas de plátano frito hasta obtener un color dorado, el complemento perfecto para cualquier plato principal.',3000],
+    ['Ensalada Camba','Nuestra ensalada fresca y ligera, con rodajas de tomate, cebolla y palmito, aderezada con limón y aceite. Una opción refrescante para equilibrar los sabores.',3800],
+    ['Yuca Cocida con Llajwa','Tierna yuca cocida al punto, servida con nuestra tradicional salsa llajwa de locoto y tomate fresco para realzar los sabores.',3200]
+  ]},
+  {id:'jugos', name:'Jugos', items:[
+    ['Jugo de Achachairú','Refrescante y exótico, un jugo tropical hecho con la pulpa de la fruta amazónica achachairú, con un toque dulce y ácido.',3800],
+    ['Jugo de Mocochinchi','Nuestra bebida tradicional y reconfortante, hecha a fuego lento con durazno deshidratado, canela y clavo, servida fría para el deleite de todos.',3500],
+    ['Jugo de Tamarindo','Un jugo cítrico con el balance perfecto entre ácido y dulce, refrescante y perfecto para acompañar cualquier plato.',3500],
+    ['Jugo de Guapurú','Un jugo suave y exótico, hecho con la fruta morada típica del oriente boliviano, con un sabor delicado que te transportará a la selva.',3800]
+  ]},
+  {id:'bebidas', name:'Bebidas', items:[
+    ['Somó Tradicional','Nuestro somó es un refresco ancestral del oriente boliviano, preparado con maíz frangollo, especias y un sabor suave y reconfortante.',3900],
+    ['Refresco de Linaza','Una bebida nutritiva y revitalizante del oriente boliviano, elaborada con linaza, canela y un toque cítrico.',3200],
+    ['Chicha Camba','Una bebida refrescante y tradicional del oriente boliviano, hecha de harina de maíz tostada, canela y clavo, servida bien fría.',3500],
+    ['Cerveza Artesanal Cruceña','Una selección de cervezas artesanales producidas en Santa Cruz, con sabores locales, ligeros y equilibrados para acompañar nuestros platos.',4200]
+  ]},
+  {id:'vinos', name:'Vinos', items:[
+    ['Vino Blanco Seco – 1750 Sublime','Este vino de Samaipata presenta notas a frutas exóticas y cítricos, con una acidez equilibrada que lo hace refrescante e inolvidable.',[['Copa',5500],['Botella',19000]]],
+    ['Vino Rosado – 1750 Syrah Rosé','Un vino elegante y fresco con notas a frutas rojas y acidez vibrante. Su color granate y su final seco lo hacen ideal para aperitivos y mariscos.',[['Copa',5500],['Botella',19000]]],
+    ['Vino Tinto Joven – Landsuá Parras del Fuerte','Un vino de Samaipata con una gran expresión organoléptica de la cepa. Sus notas de frutas rojas y especias lo hacen ideal para acompañar carnes asadas y guisos.',[['Copa',6000],['Botella',21000]]],
+    ['Vino Reserva – 1750 Tannat','Este tannat de Samaipata tiene un color rojo profundo, con aromas intensos a moras y ciruelas. En boca es potente, elegante y complejo.',[['Copa',7000],['Botella',25000]]]
+  ]},
+  {id:'postres', name:'Postres', items:[
+    ['Dulce de Guayaba','Trozos de guayaba cocida lentamente con azúcar, que resultan en un meloso manjar con un intenso sabor a fruta tropical.',4000],
+    ['Majablanco Casero','Un cremoso postre tradicional del oriente boliviano, hecho con leche y azúcar, de textura suave y reconfortante.',4200],
+    ['Arroz con Leche Cruceño','Arroz cocido a la perfección con leche, azúcar y el toque casero de la canela, al estilo del oriente, servido tibio.',3800],
+    ['Cuajada con Miel de Caña','Refrescante leche cuajada, servida con una generosa porción de miel de caña para un contraste perfecto entre la acidez y el dulce.',4000]
+  ]},
+  {id:'cafes-infusiones', name:'Cafés e infusiones', items:[
+    ['Café Yungueño','Café boliviano de granos selectos, de aroma pronunciado y sabor suave.',3100],
+    ['Café Tostado Tradicional','Café de tueste medio, con sabor intenso y cuerpo completo. Perfecto para comenzar el día.',2800],
+    ['Café con Leche Camba','Café de Santa Cruz, mezclado con leche y un toque de canela. Un clásico casero.',3300],
+    ['Café Frío con Leche de Coco','Café helado con la dulzura natural de la leche de coco. Una versión refrescante y tropical.',3700],
+    ['Infusión de Wira Wira','Infusión tradicional del oriente boliviano, conocida por sus propiedades reconfortantes.',3000],
+    ['Mate de Cedrón o Menta','Infusión de hierbas aromáticas, ideal para una digestión ligera después de comer.',2800],
+    ['Infusión de Canela con Limón','Una infusión de canela reconfortante con un toque cítrico que realza su sabor.',2700],
+    ['Infusión de Mate','Hierba mate de la región, con un sabor suave y un toque de amargor.',2900]
+  ]},
+  {id:'bajativos', name:'Bajativos', items:[
+    ['Ron Cruceño Añejo','Licor de caña de azúcar 100% cruceña, con un sabor suave y un aroma único. Servido solo o con hielo.',4500],
+    ['Aguardiente de Caña con Miel','Destilado de caña artesanal, con un toque de miel pura. Un digestivo tradicional de la zona, servido caliente.',4200],
+    ['Sucumbé Caliente','Bebida tradicional de las noches cruceñas, preparada con singani, leche, canela y una espuma cremosa.',4800],
+    ['Tónico de Cítricos con Singani','Una mezcla refrescante de singani con zumos cítricos de la región y un toque de hierbas. Un digestivo ligero y aromático.',4000]
+  ]}
+];
+
+var INGREDIENTES = ['Yuca','Plátano','Maíz','Charque','Queso menonita','Singani','Palmito','Mocochinchi'];
+
+/* ====== Utilidades ====== */
+function $(s, r){ return (r||document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function norm(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function money(n){ return '$' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function smoothTo(el){ el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'}); }
+
+/* ====== Título letra por letra ====== */
+(function(){
+  var h = $('#title'); if(!h) return;
+  h.setAttribute('aria-label', h.textContent.replace(/\s+/g,' ').trim());
+  var i = 0;
+  $$('.w', h).forEach(function(w){
+    var t = w.textContent; w.setAttribute('aria-hidden','true'); w.innerHTML = '';
+    t.split('').forEach(function(ch){
+      var s = document.createElement('span'); s.className = 'ch';
+      s.style.setProperty('--i', i++); s.textContent = ch === ' ' ? ' ' : ch; w.appendChild(s);
+    });
+  });
+})();
+
+/* ====== Franja de ingredientes ====== */
+(function(){
+  var words = ['Yuca','Plátano','Maíz','Charque','Queso menonita','Llajwa','Mocochinchi','Singani','Achachairú','Guapurú','Palmito','Miel de caña'];
+  var one = words.map(function(w){ return '<span>'+esc(w)+'</span>'; }).join('');
+  $('#mq').innerHTML = one + one;
+})();
+
+/* ====== Carta ====== */
+var flat = [];
+function dishHTML(c, ii, it){
+  var name = it[0], desc = it[1], price = it[2];
+  var opts = Array.isArray(price) ? price : [[null, price]];
+  var id = c.id + '-' + ii;
+  var btns = opts.map(function(o){
+    var label = o[0], p = o[1], key = id + '|' + (label || '');
+    flat.push({key:key, name:name, label:label||'', price:p});
+    return '<button type="button" class="buy" data-key="'+esc(key)+'" data-name="'+esc(name)+'" data-label="'+esc(label||'')+'" data-price="'+p+'"'+
+      ' aria-label="Agregar '+esc(name)+(label?' ('+esc(label)+')':'')+' al pedido, '+money(p)+'">'+
+      '<span class="buy__txt">'+(label ? esc(label)+' ' : '')+money(p)+'</span><span class="buy__qty" aria-hidden="true"></span></button>';
+  }).join('');
+  return '<article class="dish reveal" data-search="'+esc(norm(name+' '+desc))+'">'+
+    '<div class="dish__body"><h3>'+esc(name)+'</h3><p>'+esc(desc)+'</p></div>'+
+    '<div class="dish__buy">'+btns+'</div></article>';
+}
+$('#menu').innerHTML = CATS.map(function(c, ci){
+  return '<section class="cat" id="'+c.id+'">'+
+    '<header class="cat__head reveal" style="background:linear-gradient(90deg,rgba(8,25,13,.9),rgba(8,25,13,.25)),url('+c.id+'.jpg) center/cover no-repeat"><span class="cat__num" aria-hidden="true">'+String(ci+1).padStart(2,'0')+'</span>'+
+    '<h2>'+esc(c.name)+'</h2><p>'+c.items.length+' opciones</p></header>'+
+    '<div class="cat__list">'+c.items.map(function(it, ii){ return dishHTML(c, ii, it); }).join('')+'</div></section>';
+}).join('');
+
+$('#chips').innerHTML = CATS.map(function(c){
+  return '<button type="button" class="chip" data-go="'+c.id+'">'+esc(c.name)+'</button>';
+}).join('');
+
+/* Explorador por ingrediente */
+var dishTexts = $$('.dish').map(function(d){ return d.getAttribute('data-search'); });
+$('#ings').innerHTML = INGREDIENTES.map(function(g){
+  var n = dishTexts.filter(function(t){ return t.indexOf(norm(g)) !== -1; }).length;
+  return '<button type="button" class="ing" data-ing="'+esc(g)+'">'+esc(g)+' <b>'+n+'</b></button>';
+}).join('');
+
+/* Búsqueda */
+var q = $('#q');
+function applyFilter(){
+  var raw = q.value.trim(), t = norm(raw), shown = 0;
+  $$('.dish').forEach(function(d){
+    var hit = !t || d.getAttribute('data-search').indexOf(t) !== -1;
+    d.hidden = !hit; if(hit) shown++;
+  });
+  $$('.cat').forEach(function(s){
+    var any = $$('.dish', s).some(function(d){ return !d.hidden; });
+    s.hidden = !any;
+    var chip = $('.chip[data-go="'+s.id+'"]'); if(chip) chip.classList.toggle('dim', !any);
+  });
+  $('#clear').hidden = !t;
+  $('#count').textContent = !t ? '' : (shown ? shown + (shown === 1 ? ' plato' : ' platos') + ' con “' + raw + '”' : 'No hay platos con esa palabra. Prueba con otra.');
+}
+q.addEventListener('input', applyFilter);
+$('#clear').addEventListener('click', function(){ q.value = ''; applyFilter(); q.focus(); });
+$('#ings').addEventListener('click', function(e){
+  var b = e.target.closest('.ing'); if(!b) return;
+  q.value = b.getAttribute('data-ing'); applyFilter(); smoothTo($('#carta'));
+});
+
+/* Categorías: ir a la sección y resaltar la visible */
+var chipsEl = $('#chips');
+chipsEl.addEventListener('click', function(e){
+  var b = e.target.closest('.chip'); if(!b) return;
+  var sec = document.getElementById(b.getAttribute('data-go'));
+  if(sec.hidden){ q.value = ''; applyFilter(); }
+  smoothTo(sec);
+});
+function setActive(id){
+  $$('.chip', chipsEl).forEach(function(c){
+    var on = c.getAttribute('data-go') === id;
+    c.classList.toggle('on', on);
+    if(on){
+      var left = c.offsetLeft - (chipsEl.clientWidth - c.offsetWidth)/2;
+      try{ chipsEl.scrollTo({left:left, behavior: reduce ? 'auto' : 'smooth'}); }catch(err){ chipsEl.scrollLeft = left; }
+    }
+  });
+}
+if('IntersectionObserver' in window){
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting) setActive(en.target.id); });
+  }, {rootMargin:'-130px 0px -65% 0px'});
+  $$('.cat').forEach(function(s){ spy.observe(s); });
+}
+
+/* ====== Pedido ====== */
+var cart = {};      /* key -> {name,label,price,qty} */
+var order = [];     /* orden de inserción de las claves */
+function cartCount(){ return order.reduce(function(a,k){ return a + cart[k].qty; }, 0); }
+function cartTotal(){ return order.reduce(function(a,k){ return a + cart[k].qty * cart[k].price; }, 0); }
+function change(key, info, delta){
+  var l = cart[key];
+  if(!l){ if(delta < 0) return; l = cart[key] = {name:info.name, label:info.label, price:info.price, qty:0}; order.push(key); }
+  l.qty += delta;
+  if(l.qty <= 0){ delete cart[key]; order = order.filter(function(k){ return k !== key; }); }
+  refresh();
+}
+function refresh(){
+  var n = cartCount(), tot = cartTotal();
+  $$('.buy').forEach(function(b){
+    var l = cart[b.getAttribute('data-key')];
+    b.classList.toggle('on', !!l);
+    $('.buy__qty', b).textContent = l ? '×' + l.qty : '';
+  });
+  $('#orderbar').classList.toggle('show', n > 0);
+  $('#obText').textContent = n + (n === 1 ? ' plato en tu pedido' : ' platos en tu pedido');
+  $('#obTotal').textContent = money(tot);
+  $('#navOrder').hidden = n === 0;
+  $('.nav').classList.toggle('has-order', n > 0);
+  $('#navCount').textContent = n;
+  if($('#sheet').classList.contains('open')) renderSheet();
+}
+$('#menu').addEventListener('click', function(e){
+  var b = e.target.closest('.buy'); if(!b) return;
+  change(b.getAttribute('data-key'), {name:b.getAttribute('data-name'), label:b.getAttribute('data-label'), price:Number(b.getAttribute('data-price'))}, 1);
+  b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+});
+
+function orderText(){
+  var lines = order.map(function(k){ var l = cart[k];
+    return '• ' + l.qty + ' × ' + l.name + (l.label ? ' (' + l.label + ')' : '') + ' — ' + money(l.qty * l.price); });
+  var nm = $('#cname').value.trim(), nt = $('#cnote').value.trim();
+  return 'Hola, quiero hacer un pedido en ' + CONFIG.nombre + ':\n' + lines.join('\n') + '\nTotal: ' + money(cartTotal()) +
+    (nm ? '\nNombre: ' + nm : '') + (nt ? '\nNota: ' + nt : '');
+}
+function waHref(text){ return 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text); }
+function renderSheet(){
+  var ul = $('#lines');
+  if(!order.length){
+    ul.innerHTML = '<li class="empty">Aún no agregas platos. Toca el precio de un plato para sumarlo.</li>';
+  } else {
+    ul.innerHTML = order.map(function(k){ var l = cart[k];
+      return '<li class="line"><div class="line__t"><strong>'+esc(l.name)+'</strong>'+(l.label?'<span>'+esc(l.label)+'</span>':'')+'</div>'+
+        '<div class="step"><button type="button" data-k="'+esc(k)+'" data-d="-1" aria-label="Quitar uno de '+esc(l.name)+'">−</button><span>'+l.qty+'</span>'+
+        '<button type="button" data-k="'+esc(k)+'" data-d="1" aria-label="Agregar uno de '+esc(l.name)+'">+</button></div>'+
+        '<div class="line__p">'+money(l.qty*l.price)+'</div></li>'; }).join('');
+  }
+  $('#total').textContent = money(cartTotal());
+  var txt = order.length ? orderText() : '';
+  $('#prev').value = txt;
+  $('#wa').href = order.length ? waHref(txt) : '#';
+  $('#wa').style.opacity = order.length ? '1' : '.5';
+}
+$('#lines').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-k]'); if(!b) return;
+  var k = b.getAttribute('data-k'), l = cart[k]; if(!l) return;
+  change(k, l, Number(b.getAttribute('data-d')));
+});
+['#cname','#cnote'].forEach(function(s){ $(s).addEventListener('input', renderSheet); });
+
+var lastFocus = null;
+function openSheet(){
+  lastFocus = document.activeElement; $('#copyMsg').textContent = '';
+  renderSheet(); $('#sheet').classList.add('open'); document.documentElement.classList.add('lock'); $('#sheetClose').focus();
+}
+function closeSheet(){
+  $('#sheet').classList.remove('open'); document.documentElement.classList.remove('lock');
+  if(lastFocus && lastFocus.focus) lastFocus.focus();
+}
+$('#orderOpen').addEventListener('click', openSheet);
+$('#navOrder').addEventListener('click', openSheet);
+$('#sheetClose').addEventListener('click', closeSheet);
+$('#sheetBg').addEventListener('click', closeSheet);
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && $('#sheet').classList.contains('open')) closeSheet(); });
+$('#wa').addEventListener('click', function(e){ if(!order.length) e.preventDefault(); });
+
+function copyText(text, ta, msgEl){
+  function fallback(){
+    ta.focus(); ta.select();
+    msgEl.textContent = 'Texto seleccionado. Cópialo con el menú de tu teléfono.';
+  }
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ msgEl.textContent = 'Copiado.'; }, fallback);
+    } else { fallback(); }
+  }catch(err){ fallback(); }
+}
+$('#copy').addEventListener('click', function(){ if(order.length) copyText($('#prev').value, $('#prev'), $('#copyMsg')); });
+
+/* ====== Reserva ====== */
+(function(){
+  var d = new Date(); var iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  $('#rdate').min = iso;
+  $('#info').innerHTML =
+    '<div><dt>Dónde</dt><dd class="'+(CONFIG.direccion?'':'muted')+'">'+esc(CONFIG.direccion || 'Dirección por confirmar')+'</dd></div>'+
+    '<div><dt>Horario</dt><dd class="'+(CONFIG.horario?'':'muted')+'">'+esc(CONFIG.horario || 'Horario por confirmar')+'</dd></div>'+
+    '<div><dt>Pedidos</dt><dd>Arma tu pedido en la carta y envíalo por WhatsApp.</dd></div>';
+  $('#resa').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nm = $('#rname').value.trim(), dt = $('#rdate').value, tm = $('#rtime').value, pp = $('#rppl').value, nt = $('#rnote').value.trim();
+    var err = $('#resaErr'); err.textContent = '';
+    if(!nm){ err.textContent = 'Escribe tu nombre.'; $('#rname').focus(); return; }
+    if(!dt){ err.textContent = 'Elige la fecha.'; $('#rdate').focus(); return; }
+    if(!tm){ err.textContent = 'Elige la hora.'; $('#rtime').focus(); return; }
+    var parts = dt.split('-'); var fecha = parts[2] + '/' + parts[1] + '/' + parts[0];
+    var txt = 'Hola, quiero reservar una mesa en ' + CONFIG.nombre + ':\nNombre: ' + nm + '\nPersonas: ' + pp + '\nFecha: ' + fecha + '\nHora: ' + tm + (nt ? '\nNota: ' + nt : '');
+    $('#resaLink').href = waHref(txt); $('#resaOut').hidden = false;
+  });
+})();
+
+/* ====== Barra superior ====== */
+var topbar = $('#topbar');
+function onScrollTop(){ topbar.classList.toggle('solid', window.scrollY > 40); }
+onScrollTop();
+
+/* ====== Entrada al hacer scroll (solo lo que está fuera de pantalla) ====== */
+if('IntersectionObserver' in window && !reduce){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, {rootMargin:'0px 0px -6% 0px'});
+  $$('.reveal').forEach(function(el, i){
+    var r = el.getBoundingClientRect();
+    if(r.top > window.innerHeight){
+      var idx = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
+      el.style.setProperty('--d', Math.min(idx, 3) * 70 + 'ms');
+      el.classList.add('pre'); io.observe(el);
+    }
+  });
+}
+
+/* ====== Portada: lianas, hojas y brasas en canvas ====== */
+(function(){
+  var hero = $('#inicio'), fx = $('#fx'), vn = $('#vines');
+  if(!hero || !fx.getContext) return;
+  var c = fx.getContext('2d'), v = vn.getContext('2d');
+  var W = 0, H = 0, leaves = [], sparks = [], running = false, raf = 0;
+
+  function leafPath(g, s){
+    g.beginPath(); g.moveTo(0,-s);
+    g.bezierCurveTo(s*.95,-s*.4,s*.8,s*.6,0,s);
+    g.bezierCurveTo(-s*.8,s*.6,-s*.95,-s*.4,0,-s);
+    g.closePath();
+  }
+  function seeded(seed){
+    var a = seed;
+    return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function drawVines(){
+    v.clearRect(0,0,W,H);
+    var rng = seeded(11), n = Math.max(5, Math.round(W/58));
+    for(var i=0;i<n;i++){
+      var x0 = (i+.5)*W/n + (rng()-.5)*28, len = Math.min(H*.7, 90 + rng()*Math.min(H*.45, 260));
+      var amp = 6 + rng()*10, fr = .018 + rng()*.014, ph = rng()*6;
+      v.strokeStyle = 'rgba(58,128,56,.8)'; v.lineWidth = 1.6; v.beginPath();
+      for(var y=-4;y<=len;y+=4){ var x = x0 + Math.sin(y*fr+ph)*amp; if(y===-4) v.moveTo(x,y); else v.lineTo(x,y); }
+      v.stroke();
+      for(var yy=14; yy<len; yy += 15 + rng()*9){
+        var xx = x0 + Math.sin(yy*fr+ph)*amp, side = rng() < .5 ? -1 : 1, sz = 5 + rng()*7;
+        v.save(); v.translate(xx,yy); v.rotate(side*(.7+rng()*.6)); v.translate(0,sz);
+        v.fillStyle = 'hsla('+(95+rng()*40)+',52%,'+(26+rng()*18)+'%,.92)'; leafPath(v,sz); v.fill(); v.restore();
+      }
+    }
+  }
+  function newLeaf(init){
+    return {x:Math.random()*W, y:init ? Math.random()*H : -20, s:6+Math.random()*9, r:Math.random()*6.28, vr:(Math.random()-.5)*.03,
+      vy:.35+Math.random()*.6, ph:Math.random()*6.28, sw:.6+Math.random()*1.2, h:85+Math.random()*50, l:34+Math.random()*22};
+  }
+  function newSpark(init){
+    return {x:W/2+(Math.random()-.5)*W*.55, y:init ? H*(.55+Math.random()*.45) : H+4, vy:.5+Math.random()*1.1,
+      ph:Math.random()*6.28, life:init ? Math.random() : 0, s:.8+Math.random()*1.8};
+  }
+  function seed(){
+    var small = W < 500;
+    leaves = []; sparks = [];
+    for(var i=0;i<(small?16:28);i++) leaves.push(newLeaf(true));
+    for(var j=0;j<(small?14:26);j++) sparks.push(newSpark(true));
+  }
+  function size(){
+    var r = hero.getBoundingClientRect(); W = r.width; H = r.height;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    [fx, vn].forEach(function(cv){ cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr); });
+    c.setTransform(dpr,0,0,dpr,0,0); v.setTransform(dpr,0,0,dpr,0,0);
+    drawVines(); seed(); if(!running) frame(0);
+  }
+  function frame(t){
+    c.clearRect(0,0,W,H);
+    var moving = running;
+    leaves.forEach(function(l){
+      if(moving){ l.y += l.vy; l.x += Math.sin(t/900 + l.ph) * l.sw * .5; l.r += l.vr; if(l.y > H + 20){ var n = newLeaf(false); n.x = Math.random()*W; Object.assign(l, n); } }
+      c.save(); c.translate(l.x,l.y); c.rotate(l.r);
+      c.fillStyle = 'hsla('+l.h+',55%,'+l.l+'%,.55)'; leafPath(c,l.s); c.fill();
+      c.strokeStyle = 'rgba(8,25,13,.35)'; c.lineWidth = .8; c.beginPath(); c.moveTo(0,-l.s); c.lineTo(0,l.s); c.stroke();
+      c.restore();
+    });
+    sparks.forEach(function(s){
+      if(moving){ s.y -= s.vy; s.x += Math.sin(t/600 + s.ph) * .4; s.life += .004; if(s.life >= 1) Object.assign(s, newSpark(false)); }
+      var a = Math.max(0, 1 - s.life);
+      c.fillStyle = 'rgba(244,160,58,'+(a*.9)+')'; c.beginPath(); c.arc(s.x, s.y, s.s, 0, 6.2832); c.fill();
+    });
+  }
+  function loop(t){ if(!running) return; frame(t); raf = requestAnimationFrame(loop); }
+  function start(){ if(running || reduce) return; running = true; raf = requestAnimationFrame(loop); }
+  function stop(){ running = false; cancelAnimationFrame(raf); }
+
+  size();
+  if('ResizeObserver' in window){ new ResizeObserver(function(){ var r = hero.getBoundingClientRect(); if(Math.abs(r.width - W) > 1 || Math.abs(r.height - H) > 1) size(); }).observe(hero); }
+  else { window.addEventListener('resize', size); }
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(en){ if(en[0].isIntersecting) start(); else stop(); }).observe(hero);
+  } else { start(); }
+
+  /* Profundidad al hacer scroll */
+  var inner = $('#heroInner'), ticking = false;
+  function par(){
+    ticking = false; var y = window.scrollY;
+    onScrollTop();
+    if(reduce || y > H) return;
+    vn.style.transform = 'translate3d(0,' + (y*.18) + 'px,0)';
+    inner.style.transform = 'translate3d(0,' + (y*.1) + 'px,0)';
+    inner.style.opacity = String(Math.max(0, 1 - y/(H*.9)));
+  }
+  window.addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(par); } }, {passive:true});
+})();
+
+refresh();
+})();
+</script>
+</body>
+</html>
